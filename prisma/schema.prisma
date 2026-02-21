@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Video {
+  id                    String   @id @default(cuid())
+  url                   String   @unique
+  title                 String
+  channel               String
+  language              String   @default("ja")
+  durationMin           Int      @map("duration_min")
+  publishedAt           DateTime @map("published_at")
+  tags                  String   // JSON array stored as string
+  hasCc                 Boolean  @default(false) @map("has_cc")
+  hasChapters           Boolean  @default(false) @map("has_chapters")
+  sourceNotes           String?  @map("source_notes")
+  freshnessScore        Float    @default(0) @map("freshness_score")
+  qualityScore          Float    @default(0) @map("quality_score")
+  beginnerComfortIndex  Int      @default(0) @map("beginner_comfort_index")
+  transcriptSummary     String?  @map("transcript_summary")
+  glossary              String?  // JSON array stored as string
+  deprecatedFlags       String?  @map("deprecated_flags") // JSON array stored as string
+  prerequisites         String?  // e.g. "Python基礎知識"
+  learnings             String?  // JSON array stored as string
+  difficulty            String   @default("easy") // easy, normal, hard
+  hasSampleCode         Boolean  @default(false) @map("has_sample_code")
+  likeRatio             Float    @default(0) @map("like_ratio")
+  isPublished           Boolean  @default(true) @map("is_published")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  pathSteps    PathStep[]
+  userProgress UserProgress[]
+  feedbacks    Feedback[]
+
+  @@index([isPublished, beginnerComfortIndex])
+  @@index([isPublished, publishedAt])
+  @@index([difficulty])
+  @@map("videos")
+}
+
+model Path {
+  id                String   @id @default(cuid())
+  title             String
+  targetAudience    String   @map("target_audience")
+  goal              String
+  totalTimeEstimate Int      @map("total_time_estimate")
+  isPublished       Boolean  @default(true) @map("is_published")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  steps PathStep[]
+
+  @@map("paths")
+}
+
+model PathStep {
+  id                 String @id @default(cuid())
+  pathId             String @map("path_id")
+  videoId            String @map("video_id")
+  order              Int
+  whyThis            String @map("why_this")
+  checkpointQuestion String @map("checkpoint_question")
+
+  path  Path  @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@unique([pathId, order])
+  @@map("path_steps")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime? @map("email_verified")
+  name          String?
+  image         String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  role          String    @default("user") // "user" | "admin"
+
+  accounts Account[]
+  sessions Session[]
+  progress UserProgress[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model UserProgress {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  videoId    String   @map("video_id")
+  watched    Boolean  @default(false)
+  bookmarked Boolean  @default(false)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, videoId])
+  @@index([userId])
+  @@map("user_progress")
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  videoId   String   @map("video_id")
+  userId    String?  @map("user_id")
+  type      String   // "difficult", "error", "broken_link", "outdated"
+  comment   String?
+  resolved  Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@index([videoId])
+  @@map("feedbacks")
+}
+
+model AppSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String // JSON stored as string
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("app_settings")
+}
