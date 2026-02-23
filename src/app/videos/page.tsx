@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useCallback, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Search, SlidersHorizontal, ChevronDown, Video } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -109,6 +110,7 @@ function VideosContent() {
       .catch(() => {
         setVideos([]);
         setTotalCount(0);
+        toast.error("動画の取得に失敗しました");
       })
       .finally(() => setIsLoading(false));
   }, [level, durations, languages, selectedTags, sort, debouncedQuery, page, buildParams, router]);

@@ -95,6 +95,7 @@ export default function AdminPage() {
       setVideos(data.videos || []);
     } catch (e) {
       console.error("Failed to fetch videos:", e);
+      toast.error("動画一覧の取得に失敗しました");
     } finally {
       setLoading(false);
     }

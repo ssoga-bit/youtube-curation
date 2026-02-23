@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -103,6 +104,7 @@ export default function VideoDetailPage() {
       // Revert on error
       if (field === "watched") setWatched(!next);
       else setBookmarked(!next);
+      toast.error("進捗の更新に失敗しました");
     });
   }
 
