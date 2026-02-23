@@ -11,7 +11,6 @@ import {
   Route,
   LayoutDashboard,
   Loader2,
-  Bot,
   Users,
 } from "lucide-react";
 import clsx from "clsx";
@@ -47,10 +46,6 @@ const PathManager = dynamic(
   () => import("@/components/admin/PathManager").then(m => ({ default: m.PathManager })),
   { loading: () => <TabLoader /> }
 );
-const SummarizerSettings = dynamic(
-  () => import("@/components/admin/SummarizerSettings").then(m => ({ default: m.SummarizerSettings })),
-  { loading: () => <TabLoader /> }
-);
 const UserManager = dynamic(
   () => import("@/components/admin/UserManager").then(m => ({ default: m.UserManager })),
   { loading: () => <TabLoader /> }
@@ -59,6 +54,7 @@ const UserManager = dynamic(
 interface Video {
   id: string;
   title: string;
+  url: string;
   channel: string;
   beginnerComfortIndex: number;
   tags: string[];
@@ -67,7 +63,7 @@ interface Video {
   durationMin: number;
 }
 
-type Tab = "videos" | "import" | "bci" | "feedback" | "paths" | "summarizer" | "users";
+type Tab = "videos" | "import" | "bci" | "feedback" | "paths" | "users";
 
 const TABS: { key: Tab; label: string; icon: typeof Film }[] = [
   { key: "videos", label: "動画管理", icon: Film },
@@ -75,7 +71,6 @@ const TABS: { key: Tab; label: string; icon: typeof Film }[] = [
   { key: "bci", label: "BCI設定", icon: SlidersHorizontal },
   { key: "feedback", label: "フィードバック", icon: MessageSquare },
   { key: "paths", label: "トラック管理", icon: Route },
-  { key: "summarizer", label: "要約設定", icon: Bot },
   { key: "users", label: "ユーザー", icon: Users },
 ];
 
@@ -255,8 +250,6 @@ export default function AdminPage() {
         {tab === "feedback" && <FeedbackList />}
 
         {tab === "paths" && <PathManager />}
-
-        {tab === "summarizer" && <SummarizerSettings />}
 
         {tab === "users" && <UserManager />}
       </div>

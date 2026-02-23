@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { LLMSummaryResult } from "@/lib/llm";
-import type { SummarizerPlugin, SummarizerInput, PluginConfigField } from "./types";
+import type { SummarizerPlugin, SummarizerInput } from "./types";
 import { validateSummaryResult } from "./validate";
 
 const PROMPT_TEMPLATE = (videoTitle: string, transcript: string) =>
@@ -32,22 +32,6 @@ const DEFAULT_MODEL = "claude-sonnet-4-20250514";
 export const claudePlugin: SummarizerPlugin = {
   name: "Claude (Direct API)",
   key: "claude",
-  configSchema: [
-    {
-      key: "apiKey",
-      label: "API Key",
-      type: "password",
-      required: false,
-      placeholder: "sk-ant-... (未設定時は環境変数を使用)",
-    },
-    {
-      key: "model",
-      label: "Model",
-      type: "text",
-      required: false,
-      placeholder: DEFAULT_MODEL,
-    },
-  ] satisfies PluginConfigField[],
 
   async summarize(
     input: SummarizerInput,

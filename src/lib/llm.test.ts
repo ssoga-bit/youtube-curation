@@ -198,7 +198,7 @@ describe("generateVideoSummary", () => {
     mockGetPlugin.mockImplementation(() => ({
       name: "Test Plugin",
       key: "test-plugin",
-      configSchema: [],
+
       summarize: mockSummarize,
     }));
 
@@ -236,7 +236,7 @@ describe("generateVideoSummary", () => {
     mockGetPlugin.mockImplementation(() => ({
       name: "Failing Plugin",
       key: "failing",
-      configSchema: [],
+
       summarize: vi.fn().mockRejectedValue(new Error("Plugin crashed")),
     }));
 
@@ -265,7 +265,7 @@ describe("generateVideoSummary", () => {
     mockGetPlugin.mockImplementation(() => ({
       name: "Test",
       key: "test",
-      configSchema: [],
+
       summarize: mockSummarize,
     }));
 

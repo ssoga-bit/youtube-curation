@@ -23,7 +23,6 @@ describe("claudePlugin", () => {
   it("has correct metadata", () => {
     expect(claudePlugin.key).toBe("claude");
     expect(claudePlugin.name).toBe("Claude (Direct API)");
-    expect(claudePlugin.configSchema.length).toBeGreaterThan(0);
   });
 
   it("returns parsed JSON result on success", async () => {

@@ -167,16 +167,6 @@ export const bciWeightsSchema = z.object({
 export type BCIWeightsInput = z.infer<typeof bciWeightsSchema>;
 
 // ============================================================
-// PUT /api/admin/summarizer-settings
-// ============================================================
-export const summarizerSettingsSchema = z.object({
-  activePlugin: z.string().min(1, "activePlugin is required"),
-  pluginConfigs: z.record(z.string(), z.any()).optional(),
-});
-
-export type SummarizerSettingsInput = z.infer<typeof summarizerSettingsSchema>;
-
-// ============================================================
 // POST /api/admin/youtube-lookup
 // ============================================================
 export const youtubeLookupSchema = z.object({

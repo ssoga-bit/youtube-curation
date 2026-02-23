@@ -12,7 +12,6 @@ describe("difyPlugin", () => {
   it("has correct metadata", () => {
     expect(difyPlugin.key).toBe("dify");
     expect(difyPlugin.name).toBe("Dify Workflow");
-    expect(difyPlugin.configSchema.length).toBeGreaterThan(0);
   });
 
   it("throws when endpoint is missing", async () => {

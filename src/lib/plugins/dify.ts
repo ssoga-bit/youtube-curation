@@ -1,26 +1,10 @@
 import type { LLMSummaryResult } from "@/lib/llm";
-import type { SummarizerPlugin, SummarizerInput, PluginConfigField } from "./types";
+import type { SummarizerPlugin, SummarizerInput } from "./types";
 import { validateSummaryResult } from "./validate";
 
 export const difyPlugin: SummarizerPlugin = {
   name: "Dify Workflow",
   key: "dify",
-  configSchema: [
-    {
-      key: "endpoint",
-      label: "Endpoint URL",
-      type: "url",
-      required: true,
-      placeholder: "https://api.dify.ai/v1",
-    },
-    {
-      key: "apiKey",
-      label: "API Key",
-      type: "password",
-      required: true,
-      placeholder: "app-...",
-    },
-  ] satisfies PluginConfigField[],
 
   async summarize(
     input: SummarizerInput,
@@ -67,6 +51,24 @@ export const difyPlugin: SummarizerPlugin = {
 };
 
 /**
+ * Strip markdown code fences (```json ... ```) that LLMs sometimes wrap around JSON.
+ */
+function stripCodeFences(text: string): string {
+  return text.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "");
+}
+
+/**
+ * Parse a JSON string, stripping markdown code fences if present.
+ */
+function safeJsonParse(text: string): Record<string, unknown> {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return JSON.parse(stripCodeFences(text.trim()));
+  }
+}
+
+/**
  * Parse Dify outputs in 3 supported patterns:
  * 1. outputs is a direct object with the expected fields
  * 2. outputs is a JSON string
@@ -78,7 +80,7 @@ function parseOutputs(
 ): Record<string, unknown> {
   if (!outputs || typeof outputs !== "object") {
     if (typeof outputs === "string") {
-      return JSON.parse(outputs);
+      return safeJsonParse(outputs);
     }
     return { transcriptSummary: fallbackTitle };
   }
@@ -92,7 +94,7 @@ function parseOutputs(
 
   // Pattern 3: outputs.result is a JSON string
   if (typeof obj.result === "string") {
-    return JSON.parse(obj.result);
+    return safeJsonParse(obj.result);
   }
 
   // Pattern 2: try treating the whole object as the result

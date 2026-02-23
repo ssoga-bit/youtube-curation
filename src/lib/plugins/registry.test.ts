@@ -35,7 +35,6 @@ describe("registry", () => {
       for (const plugin of getAllPlugins()) {
         expect(plugin.key).toBeTruthy();
         expect(plugin.name).toBeTruthy();
-        expect(Array.isArray(plugin.configSchema)).toBe(true);
         expect(typeof plugin.summarize).toBe("function");
       }
     });
