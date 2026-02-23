@@ -9,29 +9,18 @@ import {
   Check,
   Search,
   Trash2,
-  Video,
+  Video as VideoIcon,
 } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import clsx from "clsx";
 import { SummarizeButton } from "@/components/admin/SummarizeButton";
 import { BCIScoreBadge } from "@/components/video/BCIBadge";
-
-interface Video {
-  id: string;
-  title: string;
-  url: string;
-  channel: string;
-  beginnerComfortIndex: number;
-  tags: string[];
-  isPublished: boolean;
-  difficulty: string;
-  durationMin: number;
-}
+import type { VideoAdminItem } from "@/types/video";
 
 interface VideoTableProps {
-  videos: Video[];
+  videos: VideoAdminItem[];
   onTogglePublish: (id: string, publish: boolean) => Promise<void>;
-  onUpdate: (id: string, data: Partial<Video>) => Promise<void>;
+  onUpdate: (id: string, data: Partial<VideoAdminItem>) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
   onRefresh?: () => void;
 }
@@ -61,7 +50,7 @@ export const VideoTable = memo(function VideoTable({
     [videos, search]
   );
 
-  function startEdit(video: Video) {
+  function startEdit(video: VideoAdminItem) {
     setEditingId(video.id);
     setEditTitle(video.title);
     setEditTags(video.tags.join(", "));
@@ -291,7 +280,7 @@ export const VideoTable = memo(function VideoTable({
       </div>
 
       {filtered.length === 0 && (
-        <EmptyState icon={Video} message="該当する動画がありません" />
+        <EmptyState icon={VideoIcon} message="該当する動画がありません" />
       )}
     </div>
   );

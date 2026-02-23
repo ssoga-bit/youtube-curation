@@ -30,6 +30,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { videoId, type, comment } = validation.data;
+    const userId = (session.user as { id?: string })?.id ?? null;
 
     const video = await prisma.video.findUnique({ where: { id: videoId } });
     if (!video) {
@@ -41,6 +42,7 @@ export async function POST(request: NextRequest) {
         videoId,
         type,
         comment: comment || null,
+        userId,
       },
     });
 

@@ -138,7 +138,7 @@ describe("POST /api/feedback", () => {
 
     expect(prismaMock.feedback.create).toHaveBeenCalledWith(
       expect.objectContaining({
-        data: expect.objectContaining({ comment: null }),
+        data: expect.objectContaining({ comment: null, userId: "admin1" }),
       })
     );
   });

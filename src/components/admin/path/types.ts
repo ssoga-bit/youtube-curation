@@ -1,9 +1,6 @@
-export interface Video {
-  id: string;
-  title: string;
-  channel: string;
-  durationMin: number;
-}
+import type { VideoPathItem } from "@/types/video";
+
+export type Video = VideoPathItem;
 
 export interface StepForm {
   videoId: string;

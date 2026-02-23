@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions, isAdmin } from "@/lib/auth";
+import { adminHandler } from "@/lib/admin-handler";
 import { prisma } from "@/lib/prisma";
 import { calculateBCI } from "@/lib/bci";
 import { getBCIWeights } from "@/lib/bci-weights";
@@ -20,13 +19,7 @@ interface ImportVideo {
   rating?: number;
 }
 
-export async function POST(request: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!(await isAdmin(session))) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  try {
+export const POST = adminHandler(async function POST(request: NextRequest) {
     const body = await request.json();
     const validation = validateBody(importBodySchema, body);
 
@@ -175,11 +168,4 @@ export async function POST(request: NextRequest) {
       skipped,
       total: created + updated,
     });
-  } catch (error) {
-    console.error("POST /api/import error:", error);
-    return NextResponse.json(
-      { error: "Failed to import videos" },
-      { status: 500 }
-    );
-  }
-}
+}, "Failed to import videos");

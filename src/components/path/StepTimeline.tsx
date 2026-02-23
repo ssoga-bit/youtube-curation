@@ -13,37 +13,21 @@ import {
 import clsx from "clsx";
 import { useSession } from "next-auth/react";
 import { api } from "@/lib/api-client";
-
-interface Video {
-  id: string;
-  title: string;
-  durationMin: number;
-  beginnerComfortIndex: number;
-}
+import { getBCILabel } from "@/lib/bci";
+import { BCI_LABEL_THRESHOLDS } from "@/lib/constants";
+import type { VideoMinimal } from "@/types/video";
 
 interface Step {
   id: string;
   order: number;
   whyThis: string | null;
   checkpointQuestion: string | null;
-  video: Video;
+  video: VideoMinimal;
 }
 
 interface StepTimelineProps {
   pathId: string;
   steps: Step[];
-}
-
-function getBCIColor(score: number) {
-  if (score >= 70) return "bg-green-100 text-green-800";
-  if (score >= 50) return "bg-blue-100 text-blue-800";
-  return "bg-slate-100 text-slate-700";
-}
-
-function getBCILabel(score: number) {
-  if (score >= 70) return "超入門に最適";
-  if (score >= 50) return "入門OK";
-  return `BCI ${score}`;
 }
 
 export function StepTimeline({ pathId, steps }: StepTimelineProps) {
@@ -203,10 +187,14 @@ export function StepTimeline({ pathId, steps }: StepTimelineProps) {
                   <span
                     className={clsx(
                       "text-xs font-medium px-2 py-1 rounded",
-                      getBCIColor(step.video.beginnerComfortIndex)
+                      step.video.beginnerComfortIndex >= BCI_LABEL_THRESHOLDS.EXCELLENT
+                        ? "bg-green-100 text-green-800"
+                        : step.video.beginnerComfortIndex >= BCI_LABEL_THRESHOLDS.GOOD
+                        ? "bg-blue-100 text-blue-800"
+                        : "bg-slate-100 text-slate-700"
                     )}
                   >
-                    {getBCILabel(step.video.beginnerComfortIndex)}
+                    {getBCILabel(step.video.beginnerComfortIndex).label || `BCI ${step.video.beginnerComfortIndex}`}
                   </span>
                 </div>
 

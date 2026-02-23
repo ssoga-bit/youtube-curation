@@ -3,18 +3,10 @@ import Link from "next/link";
 import { Play, Clock } from "lucide-react";
 import { BCIBadge } from "./BCIBadge";
 import { extractVideoId } from "@/lib/youtube";
+import type { VideoListItem } from "@/types/video";
 
 interface VideoCardProps {
-  video: {
-    id: string;
-    url?: string;
-    title: string;
-    channel: string;
-    durationMin: number;
-    tags: string[];
-    beginnerComfortIndex: number;
-    transcriptSummary?: string | null;
-  };
+  video: Omit<VideoListItem, "url"> & { url?: string };
 }
 
 export const VideoCard = memo(function VideoCard({ video }: VideoCardProps) {

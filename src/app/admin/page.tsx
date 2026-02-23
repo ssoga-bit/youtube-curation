@@ -17,6 +17,7 @@ import clsx from "clsx";
 import dynamic from "next/dynamic";
 import toast from "react-hot-toast";
 import { api } from "@/lib/api-client";
+import type { VideoAdminItem } from "@/types/video";
 
 function TabLoader() {
   return (
@@ -51,18 +52,6 @@ const UserManager = dynamic(
   { loading: () => <TabLoader /> }
 );
 
-interface Video {
-  id: string;
-  title: string;
-  url: string;
-  channel: string;
-  beginnerComfortIndex: number;
-  tags: string[];
-  isPublished: boolean;
-  difficulty: string;
-  durationMin: number;
-}
-
 type Tab = "videos" | "import" | "bci" | "feedback" | "paths" | "users";
 
 const TABS: { key: Tab; label: string; icon: typeof Film }[] = [
@@ -78,7 +67,7 @@ export default function AdminPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("videos");
-  const [videos, setVideos] = useState<Video[]>([]);
+  const [videos, setVideos] = useState<VideoAdminItem[]>([]);
   const [loading, setLoading] = useState(true);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -91,7 +80,7 @@ export default function AdminPage() {
   const fetchVideos = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await api.get<{ videos: Video[] }>("/api/admin/videos?limit=100");
+      const data = await api.get<{ videos: VideoAdminItem[] }>("/api/admin/videos?limit=100");
       setVideos(data.videos || []);
     } catch (e) {
       console.error("Failed to fetch videos:", e);
@@ -131,9 +120,9 @@ export default function AdminPage() {
     }
   }, []);
 
-  const handleUpdate = useCallback(async (id: string, data: Partial<Video>) => {
+  const handleUpdate = useCallback(async (id: string, data: Partial<VideoAdminItem>) => {
     try {
-      const json = await api.patch<{ video: Video }>(`/api/admin/videos/${id}`, data);
+      const json = await api.patch<{ video: VideoAdminItem }>(`/api/admin/videos/${id}`, data);
       setVideos((prev) =>
         prev.map((v) => (v.id === id ? { ...v, ...json.video } : v))
       );

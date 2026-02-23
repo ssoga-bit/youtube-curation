@@ -58,7 +58,8 @@ export function SummarizeButton({
         `/api/admin/videos/${videoId}/transcript`,
       );
       return data.transcript;
-    } catch {
+    } catch (e) {
+      console.warn("Failed to fetch transcript for summarize:", e);
       return null;
     }
   }

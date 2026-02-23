@@ -3,23 +3,13 @@
 import { Suspense, useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Search, SlidersHorizontal, ChevronDown, Video } from "lucide-react";
+import { Search, SlidersHorizontal, ChevronDown, Video as VideoIcon } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { VideoCard } from "@/components/video/VideoCard";
 import { FilterSidebar } from "@/components/ui/FilterSidebar";
 import { PAGINATION } from "@/lib/constants";
 import { api } from "@/lib/api-client";
-
-interface Video {
-  id: string;
-  url: string;
-  title: string;
-  channel: string;
-  durationMin: number;
-  tags: string[];
-  beginnerComfortIndex: number;
-  transcriptSummary: string | null;
-}
+import type { VideoListItem } from "@/types/video";
 
 const SORT_OPTIONS = [
   { value: "bci", label: "BCI順" },
@@ -57,7 +47,7 @@ function VideosContent() {
     parseInt(searchParams.get("page") || "1", 10)
   );
 
-  const [videos, setVideos] = useState<Video[]>([]);
+  const [videos, setVideos] = useState<VideoListItem[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -102,7 +92,7 @@ function VideosContent() {
     router.replace(`/videos${url}`, { scroll: false });
 
     setIsLoading(true);
-    api.get<{ videos: Video[]; pagination?: { total: number } }>(`/api/videos?${params.toString()}`)
+    api.get<{ videos: VideoListItem[]; pagination?: { total: number } }>(`/api/videos?${params.toString()}`)
       .then((data) => {
         setVideos(data.videos || []);
         setTotalCount(data.pagination?.total || 0);
@@ -210,7 +200,7 @@ function VideosContent() {
             </div>
           ) : (
             <EmptyState
-              icon={Video}
+              icon={VideoIcon}
               message="条件に合う動画が見つかりませんでした"
               description="フィルターを変更してみてください"
             />

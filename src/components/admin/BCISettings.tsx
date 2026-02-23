@@ -42,8 +42,8 @@ export function BCISettings() {
       .then((data) => {
         setWeights({ ...getDefaults(), ...data });
       })
-      .catch(() => {
-        // use defaults
+      .catch((e) => {
+        console.warn("Failed to load BCI weights:", e);
       })
       .finally(() => setLoading(false));
   }, []);
