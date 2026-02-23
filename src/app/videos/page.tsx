@@ -11,6 +11,7 @@ import { api } from "@/lib/api-client";
 
 interface Video {
   id: string;
+  url: string;
   title: string;
   channel: string;
   durationMin: number;
@@ -60,8 +61,16 @@ function VideosContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [debouncedQuery, setDebouncedQuery] = useState(query);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
 
   const limit = PAGINATION.VIDEOS_PER_PAGE;
+
+  // Fetch available tags from DB
+  useEffect(() => {
+    api.get<{ tags: string[] }>("/api/tags")
+      .then((data) => setAvailableTags(data.tags))
+      .catch(() => {});
+  }, []);
 
   // Debounce search query
   useEffect(() => {
@@ -165,6 +174,7 @@ function VideosContent() {
           onLanguagesChange={setLanguages}
           selectedTags={selectedTags}
           onTagsChange={setSelectedTags}
+          availableTags={availableTags}
         />
 
         {/* Video grid */}

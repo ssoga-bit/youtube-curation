@@ -94,4 +94,18 @@ describe("FilterSidebar", () => {
     const tag = screen.getByText("python");
     expect(tag.className).toContain("bg-slate-100");
   });
+
+  it("availableTags が渡されるとそのタグを表示する", () => {
+    renderSidebar({ availableTags: ["react", "nextjs", "typescript"] });
+    expect(screen.getByText("react")).toBeInTheDocument();
+    expect(screen.getByText("nextjs")).toBeInTheDocument();
+    expect(screen.getByText("typescript")).toBeInTheDocument();
+    // デフォルトタグは表示されない
+    expect(screen.queryByText("python")).not.toBeInTheDocument();
+  });
+
+  it("availableTags が空配列の場合はデフォルトタグを表示する", () => {
+    renderSidebar({ availableTags: [] });
+    expect(screen.getByText("python")).toBeInTheDocument();
+  });
 });

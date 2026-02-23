@@ -74,12 +74,14 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Search by title or channel
+    // Search by title, channel, transcriptSummary, or glossary
     if (q) {
       andConditions.push({
         OR: [
           { title: { contains: q } },
           { channel: { contains: q } },
+          { transcriptSummary: { contains: q } },
+          { glossary: { contains: q } },
         ],
       });
     }

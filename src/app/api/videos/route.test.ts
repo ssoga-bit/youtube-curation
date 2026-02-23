@@ -125,7 +125,7 @@ describe("GET /api/videos", () => {
     );
   });
 
-  it("searches by title or channel", async () => {
+  it("searches by title, channel, transcriptSummary, or glossary", async () => {
     const req = createRequest("http://localhost:3010/api/videos?q=python");
     await GET(req);
 
@@ -136,6 +136,8 @@ describe("GET /api/videos", () => {
           OR: [
             { title: { contains: "python" } },
             { channel: { contains: "python" } },
+            { transcriptSummary: { contains: "python" } },
+            { glossary: { contains: "python" } },
           ],
         }),
       ])

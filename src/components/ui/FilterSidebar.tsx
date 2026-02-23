@@ -3,7 +3,7 @@
 import { X, SlidersHorizontal } from "lucide-react";
 import clsx from "clsx";
 
-const TAG_OPTIONS = [
+const DEFAULT_TAGS = [
   "python",
   "ai",
   "git",
@@ -27,6 +27,7 @@ interface FilterSidebarProps {
   onLanguagesChange: (v: string[]) => void;
   selectedTags: string[];
   onTagsChange: (v: string[]) => void;
+  availableTags?: string[];
 }
 
 export function FilterSidebar({
@@ -40,7 +41,9 @@ export function FilterSidebar({
   onLanguagesChange,
   selectedTags,
   onTagsChange,
+  availableTags,
 }: FilterSidebarProps) {
+  const tagOptions = availableTags && availableTags.length > 0 ? availableTags : DEFAULT_TAGS;
   function toggleArrayItem(arr: string[], item: string): string[] {
     return arr.includes(item) ? arr.filter((v) => v !== item) : [...arr, item];
   }
@@ -143,7 +146,7 @@ export function FilterSidebar({
           <div className="mb-6">
             <h3 className="text-sm font-semibold text-slate-700 mb-2">テーマ</h3>
             <div className="flex flex-wrap gap-1.5">
-              {TAG_OPTIONS.map((tag) => (
+              {tagOptions.map((tag) => (
                 <button
                   key={tag}
                   onClick={() => onTagsChange(toggleArrayItem(selectedTags, tag))}
