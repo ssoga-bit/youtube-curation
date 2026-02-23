@@ -31,7 +31,9 @@ export async function GET(
       })),
     };
 
-    return NextResponse.json({ path: result });
+    return NextResponse.json({ path: result }, {
+      headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=60" },
+    });
   } catch (error) {
     console.error("GET /api/paths/[id] error:", error);
     return NextResponse.json(

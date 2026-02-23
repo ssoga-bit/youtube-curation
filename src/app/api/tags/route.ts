@@ -35,7 +35,9 @@ export async function GET() {
       .sort((a, b) => b[1] - a[1])
       .map(([tag]) => tag);
 
-    return NextResponse.json({ tags });
+    return NextResponse.json({ tags }, {
+      headers: { "Cache-Control": "public, s-maxage=600, stale-while-revalidate=60" },
+    });
   } catch (error) {
     console.error("GET /api/tags error:", error);
     return NextResponse.json({ error: "Failed to fetch tags" }, { status: 500 });
