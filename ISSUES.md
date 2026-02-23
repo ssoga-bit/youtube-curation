@@ -111,22 +111,22 @@
 
 ## 改善ロードマップ
 
-### Phase 1: 即座対応（1-2日）
+### Phase 1: 即座対応（1-2日） ✅ 完了
 
-- [ ] `NEXTAUTH_SECRET` 本番用に変更（S-1）
-- [ ] DBインデックス追加（P-1）
-- [ ] 検索 debounce 実装（P-4）
-- [ ] `next` パッケージアップグレード（S-4）
+- [x] `NEXTAUTH_SECRET` 本番用に変更（S-1）
+- [x] DBインデックス追加（P-1）
+- [x] 検索 debounce 実装（P-4）— 既に実装済み
+- [x] `next` パッケージアップグレード（S-4）— cookie脆弱性をoverridesで修正
 
-### Phase 2: 短期対応（1-2週間）
+### Phase 2: 短期対応（1-2週間） ✅ 完了
 
-- [ ] `error.tsx` / `not-found.tsx` 作成（U-1, U-2）
-- [ ] トースト通知システム導入（U-3）
-- [ ] NextAuth Session 型拡張 → `as any` 削除（Q-1）
-- [ ] `parseJson` ジェネリック化（Q-2）
-- [ ] Demo Provider の本番無効化（S-5）
-- [ ] Silent catch にログ + フィードバック追加（Q-5）
-- [ ] `admin/paths/[id]` テスト作成（Q-6）
+- [x] `error.tsx` / `not-found.tsx` 作成（U-1, U-2）— 既に実装済み
+- [x] トースト通知システム導入（U-3）— 既に実装済み
+- [x] NextAuth Session 型拡張 → `as any` 削除（Q-1）— 既に実装済み
+- [x] `parseJson` ジェネリック化（Q-2）— 既に実装済み
+- [x] Demo Provider の本番無効化（S-5）— 既に実装済み
+- [x] Silent catch にログ + フィードバック追加（Q-5）
+- [x] `admin/paths/[id]` テスト作成（Q-6）— 既に実装済み
 
 ### Phase 3: 中期対応（2-4週間）
 
