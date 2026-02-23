@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, memo } from "react";
 import { MessageSquare, Send, Loader2, Check } from "lucide-react";
 import clsx from "clsx";
 import toast from "react-hot-toast";
@@ -17,7 +17,7 @@ interface FeedbackButtonProps {
   videoId: string;
 }
 
-export function FeedbackButton({ videoId }: FeedbackButtonProps) {
+export const FeedbackButton = memo(function FeedbackButton({ videoId }: FeedbackButtonProps) {
   const [open, setOpen] = useState(false);
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [comment, setComment] = useState("");
@@ -143,4 +143,4 @@ export function FeedbackButton({ videoId }: FeedbackButtonProps) {
       )}
     </div>
   );
-}
+});

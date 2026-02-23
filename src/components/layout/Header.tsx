@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, memo } from "react";
 import { Menu, X, BookOpen, Search, LayoutDashboard, LogIn, LogOut, User } from "lucide-react";
 import { useSession, signIn, signOut } from "next-auth/react";
 
-export function Header() {
+export const Header = memo(function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { data: session, status } = useSession();
 
@@ -139,4 +139,4 @@ export function Header() {
       </div>
     </header>
   );
-}
+});

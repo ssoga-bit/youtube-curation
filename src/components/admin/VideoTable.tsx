@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, memo } from "react";
 import {
   Eye,
   EyeOff,
@@ -36,7 +36,7 @@ interface VideoTableProps {
   onRefresh?: () => void;
 }
 
-export function VideoTable({
+export const VideoTable = memo(function VideoTable({
   videos,
   onTogglePublish,
   onUpdate,
@@ -295,4 +295,4 @@ export function VideoTable({
       )}
     </div>
   );
-}
+});
