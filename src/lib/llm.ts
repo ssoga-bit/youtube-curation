@@ -30,14 +30,6 @@ export async function generateVideoSummary(
     return await plugin.summarize({ videoTitle, transcript }, pluginConfig);
   } catch (error) {
     console.error("LLM summary generation failed:", error);
-
-    return {
-      transcriptSummary: videoTitle,
-      glossary: [],
-      difficulty: "normal",
-      deprecatedFlags: [],
-      prerequisites: "不要",
-      learnings: [],
-    };
+    throw error;
   }
 }

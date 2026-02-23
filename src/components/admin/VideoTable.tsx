@@ -19,6 +19,7 @@ import { BCIScoreBadge } from "@/components/video/BCIBadge";
 interface Video {
   id: string;
   title: string;
+  url: string;
   channel: string;
   beginnerComfortIndex: number;
   tags: string[];
@@ -276,6 +277,7 @@ export function VideoTable({
                         <SummarizeButton
                           videoId={video.id}
                           videoTitle={video.title}
+                          videoUrl={video.url}
                           onSummarized={() => onRefresh?.()}
                         />
                       </>

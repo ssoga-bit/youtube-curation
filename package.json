@@ -23,6 +23,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.77.0",
     "@auth/prisma-adapter": "^2.11.1",
+    "@danielxceron/youtube-transcript": "^1.2.6",
     "@prisma/client": "^6.19.2",
     "clsx": "^2.1.1",
     "lucide-react": "^0.574.0",
@@ -34,7 +35,9 @@
     "zod": "^4.3.6"
   },
   "lint-staged": {
-    "*.{ts,tsx}": ["echo 'TypeScript files staged'"]
+    "*.{ts,tsx}": [
+      "echo 'TypeScript files staged'"
+    ]
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",

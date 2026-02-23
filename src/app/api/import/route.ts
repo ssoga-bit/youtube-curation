@@ -6,6 +6,7 @@ import { calculateBCI } from "@/lib/bci";
 import { getBCIWeights } from "@/lib/bci-weights";
 import { extractVideoId, fetchVideoMeta } from "@/lib/youtube";
 import { importBodySchema, validateBody, ImportVideoInput } from "@/lib/validations";
+import { autoSummarize } from "@/lib/auto-summarize";
 
 interface ImportVideo {
   url: string;
@@ -57,6 +58,7 @@ export async function POST(request: NextRequest) {
 
     const weights = await getBCIWeights();
 
+    const summarizeTargets: { id: string; url: string; title: string }[] = [];
     let created = 0;
     let updated = 0;
     let skipped = 0;
@@ -146,13 +148,25 @@ export async function POST(request: NextRequest) {
           where: { url: video.url },
           data,
         });
+        // 要約がまだない既存動画も自動要約の対象にする
+        if (!existing.transcriptSummary) {
+          summarizeTargets.push({ id: existing.id, url: video.url, title: data.title });
+        }
         updated++;
       } else {
-        await prisma.video.create({
+        const newVideo = await prisma.video.create({
           data: { url: video.url, ...data },
         });
+        summarizeTargets.push({ id: newVideo.id, url: video.url, title: data.title });
         created++;
       }
+    }
+
+    // Fire-and-forget: auto-summarize videos without summaries in the background
+    if (summarizeTargets.length > 0) {
+      Promise.allSettled(
+        summarizeTargets.map((v) => autoSummarize(v.id, v.url, v.title))
+      );
     }
 
     return NextResponse.json({

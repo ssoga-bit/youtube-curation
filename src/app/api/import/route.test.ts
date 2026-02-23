@@ -24,12 +24,18 @@ vi.mock("@/lib/youtube", () => ({
   fetchVideoMeta: vi.fn().mockResolvedValue(null),
 }));
 
+vi.mock("@/lib/auto-summarize", () => ({
+  autoSummarize: vi.fn().mockResolvedValue(undefined),
+}));
+
 import { getServerSession } from "next-auth";
 import { POST } from "./route";
 import { fetchVideoMeta } from "@/lib/youtube";
+import { autoSummarize } from "@/lib/auto-summarize";
 
 const mockSession = getServerSession as ReturnType<typeof vi.fn>;
 const mockFetchMeta = fetchVideoMeta as ReturnType<typeof vi.fn>;
+const mockAutoSummarize = autoSummarize as ReturnType<typeof vi.fn>;
 
 const adminSession = { user: { id: "admin1", role: "admin" } };
 
@@ -42,6 +48,8 @@ describe("POST /api/import", () => {
     prismaMock.video.update.mockReset();
     mockFetchMeta.mockReset();
     mockFetchMeta.mockResolvedValue(null);
+    mockAutoSummarize.mockReset();
+    mockAutoSummarize.mockResolvedValue(undefined);
   });
 
   it("returns 403 for non-admin", async () => {
@@ -306,6 +314,79 @@ describe("POST /api/import", () => {
       expect.objectContaining({
         data: expect.objectContaining({ qualityScore: 1 }),
       })
+    );
+  });
+
+  it("calls autoSummarize for newly created videos", async () => {
+    prismaMock.video.findUnique.mockResolvedValue(null);
+    prismaMock.video.create.mockResolvedValue({ id: "new-id" });
+
+    const req = createRequest("http://localhost:3010/api/import", {
+      method: "POST",
+      body: [
+        {
+          url: "https://youtube.com/watch?v=abc",
+          title: "Test",
+          durationMin: 10,
+        },
+      ],
+    });
+    await POST(req);
+
+    expect(mockAutoSummarize).toHaveBeenCalledWith(
+      "new-id",
+      "https://youtube.com/watch?v=abc",
+      "Test"
+    );
+  });
+
+  it("does not call autoSummarize for updated videos that already have a summary", async () => {
+    prismaMock.video.findUnique.mockResolvedValue({
+      id: "existing",
+      url: "https://youtube.com/watch?v=abc",
+      transcriptSummary: "Already summarized",
+    });
+    prismaMock.video.update.mockResolvedValue({});
+
+    const req = createRequest("http://localhost:3010/api/import", {
+      method: "POST",
+      body: [
+        {
+          url: "https://youtube.com/watch?v=abc",
+          title: "Updated",
+          durationMin: 15,
+        },
+      ],
+    });
+    await POST(req);
+
+    expect(mockAutoSummarize).not.toHaveBeenCalled();
+  });
+
+  it("calls autoSummarize for updated videos without a summary", async () => {
+    prismaMock.video.findUnique.mockResolvedValue({
+      id: "existing",
+      url: "https://youtube.com/watch?v=abc",
+      transcriptSummary: null,
+    });
+    prismaMock.video.update.mockResolvedValue({});
+
+    const req = createRequest("http://localhost:3010/api/import", {
+      method: "POST",
+      body: [
+        {
+          url: "https://youtube.com/watch?v=abc",
+          title: "Updated",
+          durationMin: 15,
+        },
+      ],
+    });
+    await POST(req);
+
+    expect(mockAutoSummarize).toHaveBeenCalledWith(
+      "existing",
+      "https://youtube.com/watch?v=abc",
+      "Updated"
     );
   });
 });

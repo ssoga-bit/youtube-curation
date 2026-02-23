@@ -1,0 +1,224 @@
+app:
+  description: YouTube動画の転写テキストから初心者向け要約・用語集・難易度を生成する
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: workflow
+  name: video-summarizer
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/openai:0.2.8@aae2be0913b8c6f0b80cff58e08d7a8b4c214569b41778413fcaea204561ff16
+    version: null
+kind: app
+version: 0.5.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 50
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: llm
+      id: 1771752148211-source-1771752150621-target
+      source: '1771752148211'
+      sourceHandle: source
+      target: '1771752150621'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: end
+      id: 1771752150621-source-1771752153890-target
+      source: '1771752150621'
+      sourceHandle: source
+      target: '1771752153890'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        selected: false
+        title: ユーザー入力
+        type: start
+        variables:
+        - default: ''
+          hint: 動画のタイトル
+          label: video_title
+          max_length: 500
+          options: []
+          placeholder: ''
+          required: true
+          type: text-input
+          variable: video_title
+        - default: ''
+          hint: 動画の転写テキスト
+          label: transcript
+          max_length: 100000
+          options: []
+          placeholder: ''
+          required: true
+          type: paragraph
+          variable: transcript
+      height: 109
+      id: '1771752148211'
+      position:
+        x: 80
+        y: 282
+      positionAbsolute:
+        x: 80
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.3
+            max_tokens: 2048
+          mode: chat
+          name: o3-pro-2025-06-10
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: 62b32484-2e54-4b54-8182-9df31fc3ac5a
+          role: system
+          text: >-
+            あなたは教育編集者です。YouTube動画の転写テキストから初心者向けにまとめてください。
+            必ず以下のJSON形式のみを出力してください。JSON以外のテキストは絶対に出力しないでください。
+        - id: 72c43595-3f65-5c65-9293-0ef42gd4bd6b
+          role: user
+          text: >-
+            動画タイトル: {{#1771752148211.video_title#}}
+
+
+            転写テキスト:
+
+            {{#1771752148211.transcript#}}
+
+
+            以下のJSON形式で出力してください（JSON以外は出力しないでください）:
+
+            {
+              "transcriptSummary": "要約（最大5文。初心者がこの動画を見るべきか判断できる内容にすること）",
+              "prerequisites": "前提知識（なければ「不要」）",
+              "learnings": ["得られること1", "得られること2", "得られること3"],
+              "difficulty": "easy または normal または hard",
+              "deprecatedFlags": ["つまずき注意点（早口/環境依存/古いAPIなど。該当する場合のみ）"],
+              "glossary": [{"term": "用語", "explain": "やさしい説明"}]
+            }
+
+
+            難易度判定基準:
+
+            - easy: 専門用語なし・具体例豊富・完全初心者向け
+
+            - normal: 一部専門用語あり・基礎知識が望ましい
+
+            - hard: 専門知識前提・経験者向け
+
+
+            用語辞書は最大5語、初心者にとって難しい用語を選択してください。
+        selected: false
+        title: LLM
+        type: llm
+        vision:
+          enabled: false
+      height: 88
+      id: '1771752150621'
+      position:
+        x: 382
+        y: 282
+      positionAbsolute:
+        x: 382
+        y: 282
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        outputs:
+        - value_selector:
+          - '1771752150621'
+          - text
+          value_type: string
+          variable: result
+        selected: false
+        title: 出力
+        type: end
+      height: 88
+      id: '1771752153890'
+      position:
+        x: 684
+        y: 282
+      positionAbsolute:
+        x: 684
+        y: 282
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    viewport:
+      x: 86.99999999999989
+      y: -4.000000000000114
+      zoom: 1.0000000000000002
+  rag_pipeline_variables: []

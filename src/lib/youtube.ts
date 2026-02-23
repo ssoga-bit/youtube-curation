@@ -2,6 +2,29 @@
  * YouTube Data API v3 integration utilities.
  */
 
+import { YoutubeTranscript } from "@danielxceron/youtube-transcript";
+
+/**
+ * Fetch transcript (subtitles) for a YouTube video.
+ * Returns the full text as a single string, or null on failure.
+ */
+export async function fetchTranscript(videoId: string): Promise<string | null> {
+  const langs = ["ja", "en", undefined];
+  for (const lang of langs) {
+    try {
+      const config = lang ? { lang } : undefined;
+      const segments = await YoutubeTranscript.fetchTranscript(videoId, config);
+      if (segments && segments.length > 0) {
+        const text = segments.map((s) => s.text).join(" ");
+        if (text) return text;
+      }
+    } catch {
+      // try next language
+    }
+  }
+  return null;
+}
+
 /**
  * Extract YouTube video ID from various URL formats:
  * - https://www.youtube.com/watch?v=VIDEO_ID

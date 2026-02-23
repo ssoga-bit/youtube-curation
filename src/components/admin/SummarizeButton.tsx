@@ -18,17 +18,20 @@ interface LLMSummaryResult {
 interface SummarizeButtonProps {
   videoId: string;
   videoTitle: string;
+  videoUrl?: string;
   onSummarized?: () => void;
 }
 
 export function SummarizeButton({
   videoId,
   videoTitle,
+  videoUrl,
   onSummarized,
 }: SummarizeButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fetchingTranscript, setFetchingTranscript] = useState(false);
   const [result, setResult] = useState<LLMSummaryResult | null>(null);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,6 +50,71 @@ export function SummarizeButton({
     setResult(null);
     setSaved(false);
     setError(null);
+  }
+
+  async function fetchTranscriptFromApi(): Promise<string | null> {
+    try {
+      const data = await api.get<{ transcript: string }>(
+        `/api/admin/videos/${videoId}/transcript`,
+      );
+      return data.transcript;
+    } catch {
+      return null;
+    }
+  }
+
+  async function handleOneClick() {
+    setLoading(true);
+    setError(null);
+    setResult(null);
+
+    try {
+      const text = await fetchTranscriptFromApi();
+      if (!text) {
+        setError("字幕を取得できませんでした。手動でテキストを入力してください。");
+        toast.error("字幕を取得できませんでした");
+        setLoading(false);
+        return;
+      }
+
+      setTranscript(text);
+
+      const data = await api.post<{ llmResult: LLMSummaryResult }>(
+        `/api/admin/videos/${videoId}/summarize`,
+        { transcript: text },
+      );
+      setResult(data.llmResult);
+      setSaved(true);
+      onSummarized?.();
+      toast.success("ワンクリック要約が完了しました");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "エラーが発生しました";
+      setError(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleFetchTranscript() {
+    setFetchingTranscript(true);
+    setError(null);
+
+    try {
+      const text = await fetchTranscriptFromApi();
+      if (text) {
+        setTranscript(text);
+        toast.success("字幕を取得しました");
+      } else {
+        setError("字幕を取得できませんでした。手動でテキストを入力してください。");
+        toast.error("字幕を取得できませんでした");
+      }
+    } catch {
+      setError("字幕の取得に失敗しました");
+      toast.error("字幕の取得に失敗しました");
+    } finally {
+      setFetchingTranscript(false);
+    }
   }
 
   async function handleGenerate() {
@@ -137,6 +205,53 @@ export function SummarizeButton({
                   {videoTitle}
                 </p>
               </div>
+
+              {/* One-click & fetch transcript buttons */}
+              {videoUrl && !result && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleOneClick}
+                    disabled={loading || fetchingTranscript}
+                    className={clsx(
+                      "flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                      loading || fetchingTranscript
+                        ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                        : "bg-purple-600 text-white hover:bg-purple-700"
+                    )}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        処理中...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4" />
+                        ワンクリック要約
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={handleFetchTranscript}
+                    disabled={loading || fetchingTranscript}
+                    className={clsx(
+                      "flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border",
+                      loading || fetchingTranscript
+                        ? "bg-slate-50 text-slate-400 border-slate-200 cursor-not-allowed"
+                        : "bg-white text-purple-600 border-purple-300 hover:bg-purple-50"
+                    )}
+                  >
+                    {fetchingTranscript ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        取得中...
+                      </>
+                    ) : (
+                      "字幕だけ取得"
+                    )}
+                  </button>
+                </div>
+              )}
 
               {/* Transcript input */}
               <div>

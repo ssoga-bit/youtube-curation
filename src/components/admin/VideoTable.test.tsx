@@ -31,6 +31,7 @@ const baseVideos = [
   {
     id: "vid-1",
     title: "Pythonで学ぶ機械学習入門",
+    url: "https://www.youtube.com/watch?v=abc123",
     channel: "AI学習チャンネル",
     beginnerComfortIndex: 80,
     tags: ["python", "ai", "ml"],
@@ -41,6 +42,7 @@ const baseVideos = [
   {
     id: "vid-2",
     title: "TypeScript実践ガイド",
+    url: "https://www.youtube.com/watch?v=def456",
     channel: "Web開発チャンネル",
     beginnerComfortIndex: 55,
     tags: ["typescript", "web"],

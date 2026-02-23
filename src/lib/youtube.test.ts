@@ -4,7 +4,17 @@ import {
   parseISO8601Duration,
   hasChapterTimestamps,
   fetchVideoMeta,
+  fetchTranscript,
 } from "./youtube";
+
+vi.mock("@danielxceron/youtube-transcript", () => ({
+  YoutubeTranscript: {
+    fetchTranscript: vi.fn(),
+  },
+}));
+
+import { YoutubeTranscript } from "@danielxceron/youtube-transcript";
+const mockFetchTranscript = YoutubeTranscript.fetchTranscript as ReturnType<typeof vi.fn>;
 
 describe("extractVideoId", () => {
   it("extracts ID from standard watch URL", () => {
@@ -125,6 +135,37 @@ describe("hasChapterTimestamps", () => {
     expect(
       hasChapterTimestamps("Some intro text\n5:30 Chapter starts here")
     ).toBe(true);
+  });
+});
+
+describe("fetchTranscript", () => {
+  beforeEach(() => {
+    mockFetchTranscript.mockReset();
+  });
+
+  it("returns joined text on success", async () => {
+    mockFetchTranscript.mockResolvedValue([
+      { text: "Hello", offset: 0, duration: 1000 },
+      { text: "World", offset: 1000, duration: 1000 },
+    ]);
+    const result = await fetchTranscript("abc123");
+    expect(result).toBe("Hello World");
+    expect(mockFetchTranscript).toHaveBeenCalledWith("abc123", { lang: "ja" });
+  });
+
+  it("returns null when all languages return empty segments", async () => {
+    mockFetchTranscript.mockResolvedValue([]);
+    const result = await fetchTranscript("abc123");
+    expect(result).toBeNull();
+    // Should have tried ja, en, and undefined
+    expect(mockFetchTranscript).toHaveBeenCalledTimes(3);
+  });
+
+  it("returns null when all languages throw errors", async () => {
+    mockFetchTranscript.mockRejectedValue(new Error("No transcript"));
+    const result = await fetchTranscript("abc123");
+    expect(result).toBeNull();
+    expect(mockFetchTranscript).toHaveBeenCalledTimes(3);
   });
 });
 
