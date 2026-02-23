@@ -42,6 +42,10 @@ model Video {
   @@index([isPublished, beginnerComfortIndex])
   @@index([isPublished, publishedAt])
   @@index([difficulty])
+  @@index([isPublished, likeRatio])
+  @@index([isPublished, qualityScore])
+  @@index([isPublished, durationMin])
+  @@index([language])
   @@map("videos")
 }
 
