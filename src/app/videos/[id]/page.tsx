@@ -24,6 +24,7 @@ import { BCIBadge } from "@/components/video/BCIBadge";
 import { VideoCard } from "@/components/video/VideoCard";
 import { FeedbackButton } from "@/components/video/FeedbackButton";
 import { api } from "@/lib/api-client";
+import { extractVideoId } from "@/lib/youtube";
 
 interface GlossaryItem {
   term: string;
@@ -128,6 +129,10 @@ export default function VideoDetailPage() {
   }
 
   const publishedDate = new Date(video.publishedAt).toLocaleDateString("ja-JP");
+  const ytVideoId = video.url ? extractVideoId(video.url) : null;
+  const thumbnailUrl = ytVideoId
+    ? `https://img.youtube.com/vi/${ytVideoId}/hqdefault.jpg`
+    : null;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
@@ -144,6 +149,25 @@ export default function VideoDetailPage() {
         <ChevronRight className="w-3.5 h-3.5" />
         <span className="text-slate-600 truncate max-w-[200px]">{video.title}</span>
       </nav>
+
+      {/* Thumbnail */}
+      {thumbnailUrl && (
+        <a
+          href={video.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block relative aspect-video rounded-lg overflow-hidden mb-6 group"
+        >
+          <img
+            src={thumbnailUrl}
+            alt={video.title}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+            <Play className="w-16 h-16 text-white/90 group-hover:scale-110 transition-transform" />
+          </div>
+        </a>
+      )}
 
       {/* Title & Channel */}
       <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">

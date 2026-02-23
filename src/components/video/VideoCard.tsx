@@ -2,10 +2,12 @@ import { memo } from "react";
 import Link from "next/link";
 import { Play, Clock } from "lucide-react";
 import { BCIBadge } from "./BCIBadge";
+import { extractVideoId } from "@/lib/youtube";
 
 interface VideoCardProps {
   video: {
     id: string;
+    url?: string;
     title: string;
     channel: string;
     durationMin: number;
@@ -17,13 +19,25 @@ interface VideoCardProps {
 
 export const VideoCard = memo(function VideoCard({ video }: VideoCardProps) {
   const tags = video.tags.slice(0, 3);
+  const ytVideoId = video.url ? extractVideoId(video.url) : null;
+  const thumbnailUrl = ytVideoId
+    ? `https://img.youtube.com/vi/${ytVideoId}/mqdefault.jpg`
+    : null;
 
   return (
     <Link href={`/videos/${video.id}`} className="group block">
       <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden">
-        {/* Thumbnail placeholder */}
+        {/* Thumbnail */}
         <div className="relative aspect-video bg-gradient-to-br from-primary-400 to-primary-700 flex items-center justify-center">
-          <Play className="w-12 h-12 text-white/80 group-hover:text-white group-hover:scale-110 transition-transform" />
+          {thumbnailUrl ? (
+            <img
+              src={thumbnailUrl}
+              alt={video.title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <Play className="w-12 h-12 text-white/80 group-hover:text-white group-hover:scale-110 transition-transform" />
+          )}
           <span className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
             {video.durationMin}分
           </span>

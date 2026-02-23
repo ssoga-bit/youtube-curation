@@ -9,8 +9,16 @@ vi.mock("next/link", () => ({
   ),
 }));
 
+vi.mock("@/lib/youtube", () => ({
+  extractVideoId: (url: string) => {
+    const match = url.match(/[?&]v=([^&]+)/);
+    return match ? match[1] : null;
+  },
+}));
+
 const baseVideo = {
   id: "vid-1",
+  url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
   title: "Pythonで学ぶ機械学習入門",
   channel: "AI学習チャンネル",
   durationMin: 15,
@@ -68,5 +76,21 @@ describe("VideoCard", () => {
     render(<VideoCard video={baseVideo} />);
     const link = screen.getByRole("link");
     expect(link).toHaveAttribute("href", "/videos/vid-1");
+  });
+
+  it("YouTubeサムネイルを表示する", () => {
+    render(<VideoCard video={baseVideo} />);
+    const img = screen.getByRole("img");
+    expect(img).toHaveAttribute(
+      "src",
+      "https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg"
+    );
+    expect(img).toHaveAttribute("alt", baseVideo.title);
+  });
+
+  it("url が未指定の場合はサムネイルなし", () => {
+    const { url: _, ...videoWithoutUrl } = baseVideo;
+    render(<VideoCard video={videoWithoutUrl} />);
+    expect(screen.queryByRole("img")).not.toBeInTheDocument();
   });
 });
